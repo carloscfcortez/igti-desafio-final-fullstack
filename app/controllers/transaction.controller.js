@@ -18,7 +18,6 @@ const create = async (req, res) => {
 
 const findAll = async (req, res, next) => {
   const period = req.query.period;
-
   try {
 
     if (!period) throw new Error("É necessário informar o prâmetro period");
