@@ -72,12 +72,19 @@ export default function Transaction() {
     calculateAmounts();
   }, [data]);
 
+  const handleEdit = (item) => {
+    setRowEdit(item);
+    setOpen(true);
+  };
+
+
+  const[open, setOpen] = useState(false);
+
+  
+
   return (
     <Fragment>
-      <ModalTransaction data={rowEdit} />
-      {/* <Button className="modal-trigger" href="#modal1" node="button">
-        Show Modal
-      </Button> */}
+      <ModalTransaction data={rowEdit} open={open} setOpen={setOpen} />
       <Container className="fluid" style={{ flex: 1 }}>
         <Row>
           <Col offset="s4">
@@ -180,7 +187,12 @@ export default function Transaction() {
                           </Row>
                         </Col>
                         <Col offset="s1">
-                          <Button className="blue modal-trigger" href="#modal1" node="button" onClick={()=> setRowEdit(item)}>
+                          <Button
+                            className="blue"
+                            // href="#modal1"
+                            node="button"
+                            onClick={() => handleEdit(item)}
+                          >
                             <Icon>create</Icon>
                           </Button>{" "}
                           <Button className="red">

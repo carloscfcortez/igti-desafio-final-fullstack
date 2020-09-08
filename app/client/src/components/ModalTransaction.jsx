@@ -12,13 +12,42 @@ import {
   Switch,
   TextInput,
 } from "react-materialize";
+import api from "../services/api";
 
-export default function ModalTransaction({ data }) {
+export default function ModalTransaction({data, open, setOpen}) {
   const [dataUpdate, setDataUpdate] = useState();
+  const [opened, setOpened] = useState(false);
+
+
+  useEffect(()=> {
+    setOpened(open);
+  }, [open])
 
   useEffect(() => {
     setDataUpdate(data);
   }, [data]);
+
+  const toogle = () => {
+    setOpened(!open);
+    setOpen(!open);
+  };
+
+  const handleSave = async () => {
+
+    if (dataUpdate._id) {
+      const response = await api.put(`/api/transaction/${dataUpdate._id}` , dataUpdate);
+      if(response.status === 200){
+        console.log('OK')
+        toogle();
+      }
+    } else {
+      const response = await api.post(`/api/transaction/` , dataUpdate);
+      if(response.status === 200){
+        console.log('OK')
+        toogle();
+      }
+    }
+  };
 
   return (
     <Modal
@@ -26,12 +55,15 @@ export default function ModalTransaction({ data }) {
         <Button flat modal="close" node="button" waves="green">
           Fechar
         </Button>,
+        <Button className="green" onClick={handleSave}>
+          Salvar
+        </Button>,
       ]}
       bottomSheet={false}
       fixedFooter={false}
       header="Edição de lançamento"
       id="modal1"
-      open={false}
+      open={opened}
       options={{
         dismissible: true,
         endingTop: "30%",
