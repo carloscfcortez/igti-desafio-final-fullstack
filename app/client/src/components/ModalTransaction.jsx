@@ -52,7 +52,7 @@ export default function ModalTransaction({data, open, setOpen}) {
   return (
     <Modal
       actions={[
-        <Button flat modal="close" node="button" waves="green">
+        <Button flat modal="close" node="button" waves="green" onClick={toogle}>
           Fechar
         </Button>,
         <Button className="green" onClick={handleSave}>

@@ -26,6 +26,7 @@ export default function Transaction() {
   const [balance, setBalance] = useState(0);
 
   const [rowEdit, setRowEdit] = useState();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function getGroupsYearsMonth() {
@@ -78,9 +79,24 @@ export default function Transaction() {
   };
 
 
-  const[open, setOpen] = useState(false);
 
-  
+  const handleNext = () => {
+    const index = yearnMonths.findIndex(x=> x.yearMonth === yearMonth);
+    if(yearnMonths.length > index)
+    {
+      let nextMonth = yearnMonths[index+1]?.yearMonth;
+      setYearMonth(nextMonth);
+    }
+  }
+
+  const handlePrevious = () => {
+    const index = yearnMonths.findIndex(x=> x.yearMonth === yearMonth);
+    if(index > 0)
+    {
+      let previusMonth = yearnMonths[index+1]?.yearMonth;
+      setYearMonth(previusMonth);
+    }
+  }
 
   return (
     <Fragment>
@@ -90,7 +106,7 @@ export default function Transaction() {
           <Col offset="s4">
             <Row>
               <Col style={{ paddingTop: 23 }}>
-                <Button>
+                <Button onClick={handlePrevious}>
                   <Icon>chevron_left</Icon>
                 </Button>
               </Col>
@@ -116,7 +132,7 @@ export default function Transaction() {
                       outDuration: 250,
                     },
                   }}
-                  value=""
+                  value={yearMonth}
                   onChange={(event) => setYearMonth(event.target.value)}
                 >
                   {yearnMonths?.map((item) => {
@@ -129,7 +145,7 @@ export default function Transaction() {
                 </Select>
               </Col>
               <Col style={{ paddingTop: 23 }}>
-                <Button>
+                <Button onClick={handleNext}>
                   <Icon>chevron_right</Icon>
                 </Button>
               </Col>
