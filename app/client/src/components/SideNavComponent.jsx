@@ -32,7 +32,7 @@ export default function SideNavComponent(props) {
         <SideNavItem subheader>Desafio Final</SideNavItem>
         <SideNavItem divider={true}></SideNavItem>
 
-        <SideNavItem href="/transactions" icon={<Icon>calculate</Icon>}>
+        <SideNavItem href="/app/transactions" icon={<Icon>calculate</Icon>}>
           Transações
         </SideNavItem>
       </SideNav>
