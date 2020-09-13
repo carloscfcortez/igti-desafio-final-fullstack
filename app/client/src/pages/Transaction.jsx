@@ -18,6 +18,7 @@ import api from "./../services/api";
 export default function Transaction() {
   const [yearMonth, setYearMonth] = useState();
   const [data, setData] = useState([]);
+  const [card, setCard] = useState([]);
   const [yearnMonths, setYearMonths] = useState([]);
 
   const [totalItems, setTotalItems] = useState(0);
@@ -27,6 +28,87 @@ export default function Transaction() {
 
   const [rowEdit, setRowEdit] = useState();
   const [open, setOpen] = useState(false);
+
+  const [valueFilter, setValueFilter] = useState();
+
+  // String.prototype.contains = function contains(charToCheck) {
+  //   return this.toLowerCase()
+  //     .split("")
+  //     .some(
+  //       (char) =>
+  //         char.localeCompare(charToCheck.toLowerCase(), "pt-BR", {
+  //           sensitivity: "base",
+  //         }) === 0
+  //     );
+  // };
+
+  // String.prototype.contains = function contains(b) {
+  //   return !!this.toLowerCase()
+
+  //     .split("")
+  //     .filter(
+  //       (v, i) =>
+  //         this.slice(i, b.length).localeCompare(b.toLowerCase(), "pt-br", {
+  //           sensitivity: "base",
+  //         }) === 0
+  //     ).length;
+  // };
+
+  // String.prototype.contains = function contains(b) {
+  //   return (
+  //     this.toLowerCase()
+  //       .normalize("NFD")
+  //       .replace(/[\u0300-\u036f]/gi, "")
+  //       .indexOf(
+  //         b
+  //           .toLowerCase()
+  //           .normalize("NFD")
+  //           .replace(/[\u0300-\u036f]/gi, "")
+  //       ) === 0
+  //   );
+  // };
+
+  useEffect(() => {
+    if (valueFilter?.length >= 3) {
+      let x = data;
+      let filterNormalize = valueFilter
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/gi, "");
+      let newData = x.filter((item) => {
+        let itemNormalize = item.description
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/gi, "");
+
+        console.log(item.description);
+        console.log(valueFilter);
+        // console.log(itemNormalize.indexOf(filterNormalize));
+        return itemNormalize.indexOf(filterNormalize) >= 0 ? item : null;
+
+        // console.log(item.description.contains(valueFilter));
+        // return item.description.contains(valueFilter) ? item : null;
+      });
+
+      console.log(newData);
+      setCard(newData);
+    } else {
+      setCard(data);
+    }
+  }, [valueFilter]);
+
+  let timer = 500;
+  let timeOut = {};
+  const handleFilter = (value) => {
+    clearTimeout(timeOut);
+    if (value?.length >= 3) {
+      timeOut = setTimeout(() => {
+        setValueFilter(value);
+      }, timer);
+    }
+
+    if (!value) setValueFilter(value);
+  };
 
   useEffect(() => {
     async function getGroupsYearsMonth() {
@@ -44,7 +126,10 @@ export default function Transaction() {
     async function getData() {
       //   return true;
       const response = await api.get(`/api/transaction?period=${yearMonth}`);
-      if (response.status === 200) setData(response.data);
+      if (response.status === 200) {
+        setData(response.data);
+        setCard(response.data);
+      }
     }
 
     if (!!yearMonth) getData();
@@ -52,12 +137,12 @@ export default function Transaction() {
 
   useEffect(() => {
     const calculateAmounts = () => {
-      if (data) {
-        setTotalItems(data.length);
+      if (card) {
+        setTotalItems(card.length);
 
         let revenue = 0;
         let expenses = 0;
-        data.forEach((item) => {
+        card.forEach((item) => {
           if (item.type === "+") {
             revenue = revenue + parseFloat(item.value);
           } else {
@@ -71,32 +156,28 @@ export default function Transaction() {
       }
     };
     calculateAmounts();
-  }, [data]);
+  }, [card, valueFilter]);
 
   const handleEdit = (item) => {
     setRowEdit(item);
     setOpen(true);
   };
 
-
-
   const handleNext = () => {
-    const index = yearnMonths.findIndex(x=> x.yearMonth === yearMonth);
-    if(yearnMonths.length > index)
-    {
-      let nextMonth = yearnMonths[index+1]?.yearMonth;
+    const index = yearnMonths.findIndex((x) => x.yearMonth === yearMonth);
+    if (yearnMonths.length > index) {
+      let nextMonth = yearnMonths[index + 1]?.yearMonth;
       setYearMonth(nextMonth);
     }
-  }
+  };
 
   const handlePrevious = () => {
-    const index = yearnMonths.findIndex(x=> x.yearMonth === yearMonth);
-    if(index > 0)
-    {
-      let previusMonth = yearnMonths[index+1]?.yearMonth;
+    const index = yearnMonths.findIndex((x) => x.yearMonth === yearMonth);
+    if (index > 0) {
+      let previusMonth = yearnMonths[index + 1]?.yearMonth;
       setYearMonth(previusMonth);
     }
-  }
+  };
 
   return (
     <Fragment>
@@ -176,10 +257,21 @@ export default function Transaction() {
             </Card>
           </Col>
         </Row>
-
         <Row>
-          {data
-            ? data?.map((item) => {
+          <Col style={{ paddingTop: 26 }} s={1}>
+            <Button>Adicionar</Button>
+          </Col>
+          <Col s={11}>
+            <TextInput
+              s={12}
+              label="Filtro"
+              onChange={(event) => handleFilter(event.target.value)}
+            ></TextInput>
+          </Col>
+        </Row>
+        <Row>
+          {card
+            ? card?.map((item) => {
                 return (
                   <Col key={item._id} s={12}>
                     <Card
